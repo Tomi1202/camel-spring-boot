@@ -19,7 +19,11 @@ public class CamelRoute extends RouteBuilder {
     public void configure() {
         from("{{startRoute}}")
                 .log("Timer invoked and the body " + environment.getProperty("message"))
-                .pollEnrich("{{fromRoute}}")
+                .choice()
+                    .when((header("env").isNotEqualTo("mock")))
+                        .pollEnrich("{{fromRoute}}")
+                    .otherwise()
+                        .log("mock env flow and the body is ${body}")
                 .to("{{toRoute}}");
     }
 }
